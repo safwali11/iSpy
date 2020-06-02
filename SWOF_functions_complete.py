@@ -3,6 +3,7 @@ import numpy as np
 import os
 import keras
 import matplotlib.pyplot as plt
+import shutil
 
 
 #############################################################################
@@ -31,7 +32,8 @@ def split_video_frames(video, length, height, width):
 
     return frames
 
-def generate_SWOF_data(DATADIR, VIDEONAME,frames, N=5, startframe=55, endframe=149):
+def generate_SWOF_data(DATADIR, VIDEONAME,frames, N=5, startframe=55,
+    endframe=149):
 
     # params for ShiTomasi corner detection
     feature_params = dict( maxCorners = 100,
@@ -40,9 +42,9 @@ def generate_SWOF_data(DATADIR, VIDEONAME,frames, N=5, startframe=55, endframe=1
                         blockSize = 7 )
 
     # Parameters for lucas kanade optical flow
-    lk_params = dict( winSize  = (15,15),
-                      maxLevel = 2,
-                      criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+    lk_params = dict(winSize  = (15,15), maxLevel = 2,
+                    criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT,
+                    10, 0.03))
 
     # Create some random colors
     color = np.random.randint(0,255,(100,3))
@@ -78,7 +80,8 @@ def generate_SWOF_data(DATADIR, VIDEONAME,frames, N=5, startframe=55, endframe=1
 
             current = frames[i]
             # calculate optical flow
-            p1, st, err = cv2.calcOpticalFlowPyrLK(prev, current, p0, None, **lk_params)
+            p1, st, err = cv2.calcOpticalFlowPyrLK(prev, current, p0, None,
+                                                    **lk_params)
 
             # Select good points
             if p1 is None:
@@ -104,21 +107,18 @@ def generate_SWOF_data(DATADIR, VIDEONAME,frames, N=5, startframe=55, endframe=1
     return SWOF_images
 
 
-def generate_testdata(DATADIR):
+def generate_testdata(TRAINDIR, TESTDIR, img_perc=0.1):
+    all_imgs = [f for f in os.listdir(TRAINDIR)]
+    rnd_imgs = np.random.choice(all_imgs, int(len(all_imgs)*img_perc))
 
     try:
-        if not os.path.exists(DATADIR):
-            os.makedirs(DATADIR)
+        if not os.path.exists(TESTDIR):
+            os.makedirs(TESTDIR)
     except OSError:
         print ('Error: Creating directory of data')
-
-    # list all files in dir
-    all_crash_imgs = [f for f in os.listdir(DATADIR) if os.path.isfile(f)]
-
-    # select 0.1 of the files randomly
-    random_files = np.random.choice(all_crash_imgs, int(len(all_crash_imgs)*.1))
-
-    return SWOF_test_images
+    for f in rnd_imgs:
+        shutil.move(TRAINDIR+f, TESTDIR)
+    return
 
 
 
@@ -134,31 +134,33 @@ def generate_testdata(DATADIR):
 
 def CNN_train_gen(DATADIR, traindatadirname='training', val_set=0.05):
     DATAFOLDER = DATADIR
-    train_generator = keras.preprocessing.image.ImageDataGenerator(rescale=1./255,
-                                                                   rotation_range=40,
-                                                                   zoom_range=0.2,
-                                                                   horizontal_flip=True,
-                                                                   vertical_flip=True,
-                                                                   fill_mode='nearest',
-                                                                   validation_split=0.05)
+    train_generator = keras.preprocessing.image.ImageDataGenerator(
+                                                        rescale=1./255,
+                                                        rotation_range=40,
+                                                        zoom_range=0.2,
+                                                        horizontal_flip=True,
+                                                        vertical_flip=True,
+                                                        fill_mode='nearest',
+                                                        validation_split=0.05)
     X_train = train_generator.flow_from_directory(DATAFOLDER+traindatadirname,
-                                                  color_mode='grayscale',
-                                                  batch_size=32,
-                                                  target_size=(108,192))
+                                                        color_mode='grayscale',
+                                                        batch_size=32,
+                                                        target_size=(108,192))
     return train_generator, X_train
 
 def CNN_test_gen(DATADIR, testdatadirname='testing'):
     DATAFOLDER = DATADIR
-    test_generator = keras.preprocessing.image.ImageDataGenerator(rescale=1./255,
-                                                                  rotation_range=40,
-                                                                  zoom_range=0.2,
-                                                                  horizontal_flip=True,
-                                                                  vertical_flip=True,
-                                                                  fill_mode='nearest')
+    test_generator = keras.preprocessing.image.ImageDataGenerator(
+                                                        rescale=1./255,
+                                                        rotation_range=40,
+                                                        zoom_range=0.2,
+                                                        horizontal_flip=True,
+                                                        vertical_flip=True,
+                                                        fill_mode='nearest')
     X_test = test_generator.flow_from_directory(DATAFOLDER+testdatadirname,
-                                                color_mode='grayscale',
-                                                batch_size=32,
-                                                target_size=(108,192))
+                                                        color_mode='grayscale',
+                                                        batch_size=32,
+                                                        target_size=(108,192))
     return test_generator, X_test
 
 
@@ -184,7 +186,7 @@ def CNN_analysis_plots(modelfit):
     history = modelfit
 
     plt.plot(history.history['accuracy'])
-    plt.plot(history.history['val_accuracy'])
+    # plt.plot(history.history['val_accuracy'])
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
@@ -192,7 +194,7 @@ def CNN_analysis_plots(modelfit):
     plt.show()
 
     plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
+    # plt.plot(history.history['val_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
@@ -216,16 +218,10 @@ import PIL.Image
 from io import BytesIO
 import IPython.display
 
-# def read_bwframes(video):
-#   #take 1st frame and grayscale
-#   ret, frame = video.read()
-#   frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-#   return ret, frame
-
 def RT_image_predict(threshold, model, mask):
     RT_image = cv2.resize(mask, dsize=(192,108))
-    RT_image = RT_image.reshape(1, np.shape(RT_image)[0], np.shape(RT_image)[1], 1)
+    RT_image = RT_image.reshape(1, np.shape(RT_image)[0],
+                                np.shape(RT_image)[1], 1)
 
     prediction = model.predict(RT_image)
     crash_prediction = prediction[0][0]
@@ -235,9 +231,9 @@ def RT_image_predict(threshold, model, mask):
 
 def OF_prelim():
 # Parameters for lucas kanade optical flow
-    lk_params = dict( winSize  = (15,15),
-                        maxLevel = 2,
-                        criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+    lk_params = dict(winSize  = (15,15), maxLevel = 2,
+                    criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT,
+                                10, 0.03))
 # params for ShiTomasi corner detection
     feature_params = dict( maxCorners = 100,
                             qualityLevel = 0.3,
@@ -287,7 +283,8 @@ def rtcalc_SWOF(model, video, N=5, threshold_val=0.2, iterations_param=100):
 
             prev = frames[i-1]
             current = frames[i]
-            p1, st, err = cv2.calcOpticalFlowPyrLK(prev, current, p0, None, **lk_params)
+            p1, st, err = cv2.calcOpticalFlowPyrLK(prev, current, p0, None,
+                                                    **lk_params)
 
             if p1 is None:
                 continue
@@ -303,14 +300,13 @@ def rtcalc_SWOF(model, video, N=5, threshold_val=0.2, iterations_param=100):
 
             p0 = good_new.reshape(-1,1,2)
 
-        # cv2.imshow('First-Person-View', mask)
-            # display image
         f = BytesIO()
         PIL.Image.fromarray(mask).save(f, 'jpeg')
         image = IPython.display.Image(data=f.getvalue(), width=360, height=240)
         image_display.update(image)
 
-        crash_prediction = RT_image_predict(threshold=threshold_val, model=model, mask=mask)
+        crash_prediction = RT_image_predict(threshold=threshold_val,
+                                            model=model, mask=mask)
         predictions.append(crash_prediction)
 
         SWOF_images.append(mask)
@@ -343,24 +339,19 @@ def save_predictions(path_save_create, SWOF_images, frames, predictions):
     f.close()
 
     for i in range(len(frames)):
-
         #save raw frame
         pil_img_f = Image.fromarray(frames[i])
         pil_img_f.save(path_save_frame +'raw_frame'+str(i)+'.jpeg')
 
-        #because len of raw frames is not = len of crash predictions or mask we need this if statement so we dont go out of bounds
-
-        if(i<(len(frames)-1)): # need to do -1 becuase the highest length for these variables are one less than the number of
-                                 # frames that exist
+        if(i<(len(frames)-1)):
             #save mask
             pil_img_f = Image.fromarray(SWOF_images[i])
             pil_img_f.save(path_save_mask +'mask_frame'+str(i+1)+'.jpeg')
 
             #save prediction in text file we created above
             f = open(path_save_prediction, "a")
-            f.write('line# ' + str(i+1) + ':crash prediction ='+str(predictions[i]) + '\n') # have line# = i+1 because it will
-                                                              # align with the numbering for raw
-                                                                                                # frames
+            f.write('line# ' + str(i+1) + ':crash prediction ='
+                    +str(predictions[i]) + '\n')
             f.close() # close to write again later
     return
 
@@ -372,7 +363,8 @@ def save_predictions(path_save_create, SWOF_images, frames, predictions):
 
 #############################################################################
 
-def rtcalc_SWOF_interm(model, video, N=5, threshold_val=0.2, iterations_param=100):
+def rtcalc_SWOF_interm(model, video, N=5, threshold_val=0.2,
+                        iterations_param=100):
 
     ret, frame = video.read()
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -408,7 +400,8 @@ def rtcalc_SWOF_interm(model, video, N=5, threshold_val=0.2, iterations_param=10
 
             prev = frames[i-1]
             current = frames[i]
-            p1, st, err = cv2.calcOpticalFlowPyrLK(prev, current, p0, None, **lk_params)
+            p1, st, err = cv2.calcOpticalFlowPyrLK(prev, current, p0, None,
+                                                    **lk_params)
 
             if p1 is None:
                 continue
@@ -424,9 +417,11 @@ def rtcalc_SWOF_interm(model, video, N=5, threshold_val=0.2, iterations_param=10
 
             p0 = good_new.reshape(-1,1,2)
 
+        cv2.namedWindow('First-Person-View', cv2.WINDOW_NORMAL)
         cv2.imshow('First-Person-View', mask)
 
-        crash_prediction = RT_image_predict(threshold=threshold_val, model=model, mask=mask)
+        crash_prediction = RT_image_predict(threshold=threshold_val,
+                                            model=model, mask=mask)
         predictions.append(crash_prediction)
 
         SWOF_images.append(mask)
@@ -447,7 +442,7 @@ def rtcalc_SWOF_interm(model, video, N=5, threshold_val=0.2, iterations_param=10
 
 #############################################################################
 
-### UART FUNCTIONS
+### REAL TIME WITH UART FUNCTIONS
 
 #############################################################################
 
@@ -457,10 +452,10 @@ import serial
 
 def UART_init():
     serial_port = serial.Serial(port="/dev/ttyTHS1",
-                            baudrate=115200,
-                            bytesize=serial.FIVEBITS,
-                            parity=serial.PARITY_NONE,
-                            stopbits=serial.STOPBITS_ONE)
+                                baudrate=115200,
+                                bytesize=serial.FIVEBITS,
+                                parity=serial.PARITY_NONE,
+                                stopbits=serial.STOPBITS_ONE)
     return serial_port
 
 def UART():
@@ -486,7 +481,8 @@ def UART():
 
 def RT_image_predict_forUART(threshold, model, mask):
     RT_image = cv2.resize(mask, dsize=(192,108))
-    RT_image = RT_image.reshape(1, np.shape(RT_image)[0], np.shape(RT_image)[1], 1)
+    RT_image = RT_image.reshape(1, np.shape(RT_image)[0],
+                                np.shape(RT_image)[1], 1)
 
     prediction = model.predict(RT_image)
     crash_prediction = prediction[0][0]
@@ -494,7 +490,8 @@ def RT_image_predict_forUART(threshold, model, mask):
         UART()
     return crash_prediction
 
-def rtcalc_SWOF_withUART(model, video, N=5, threshold_val=0.2, iterations_param=100):
+def rtcalc_SWOF_withUART(model, video, N=5, threshold_val=0.2,
+                        iterations_param=100):
 
     image_display = IPython.display.display("Real time display", display_id=1)
 
@@ -532,7 +529,8 @@ def rtcalc_SWOF_withUART(model, video, N=5, threshold_val=0.2, iterations_param=
 
             prev = frames[i-1]
             current = frames[i]
-            p1, st, err = cv2.calcOpticalFlowPyrLK(prev, current, p0, None, **lk_params)
+            p1, st, err = cv2.calcOpticalFlowPyrLK(prev, current, p0, None,
+                                                    **lk_params)
 
             if p1 is None:
                 continue
@@ -548,14 +546,11 @@ def rtcalc_SWOF_withUART(model, video, N=5, threshold_val=0.2, iterations_param=
 
             p0 = good_new.reshape(-1,1,2)
 
+        cv2.namedWindow('First-Person-View', cv2.WINDOW_NORMAL)
         cv2.imshow('First-Person-View', mask)
 
-        # f = BytesIO()
-        # PIL.Image.fromarray(mask).save(f, 'jpeg')
-        # image = IPython.display.Image(data=f.getvalue(), width=360, height=240)
-        # image_display.update(image)
-
-        crash_prediction = RT_image_predict_forUART(threshold=threshold_val, model=model, mask=mask)
+        crash_prediction = RT_image_predict_forUART(threshold=threshold_val,
+                                                    model=model, mask=mask)
         predictions.append(crash_prediction)
 
         SWOF_images.append(mask)
