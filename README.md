@@ -6,15 +6,15 @@ Project Proceedings PDF May 2020
 **Version 1.0.0**
 
 ## Table of Contents
-* Introduction
-* Hardware and Software Setup
-* Design
-* Files Description
-* Contributors
+1. Introduction
+2. Hardware and Software Setup
+3. Design
+4. Files Description
+5. Contributors
 
 ---
 
-## Introduction
+## 1. Introduction
 This project presents a real-time collision avoidance alert system using deep
 learning image processing to trigger a microcontroller. The motivation for this
 project is to integrate the system with first-person-view drone flight
@@ -32,71 +32,36 @@ a universal asynchronous receiver/transmitter, a device for data transmission.
 The training model achieved 85.6\% accuracy with 33.6\% loss. When the system
 was tested, it was able to predict and alert with approximately 72\%.
 
-The image processing components of this project were merged into one system and
-implemented on the Jetson Nano’s GPU. Figure 3 shows the overall image
-processing pipeline. A real-time video stream is analyzed through an optical
-flow algorithm to generate images of the vector field between the frames. The
-vector field images are then analyzed through CNN to predict if the images are
-crash or no crash images. As shown in Figure 4, to create the complete CNN,
-pre-recorded drone frames processed through an optical flow algorithm were used
-to train a model. To determine if the drone is about to crash onto any objects
-within the frame, the CNN prediction values are compared to the potential crash
-threshold value. If there are potential crash objects in the frame, an alert is
-communicated to the drone flight controller through UART.
-
-Since the training model is predicting crash or no crash in the frame, a
-boundary has to be determined and set to alert the system before we encounter a
-frame detected as crash. The solution is using the training model’s prediction
-values of crash and no crash per image to understand the danger level of a crash
-occurring. When the prediction for crash is  the threshold value of 0.3 (meaning
-prediction of crash is 30\% and the frame is labeled as no crash), the SOM is
-required to convey the potential crash to the main flight controller. The 30\%
-threshold shows that the camera is not detecting a crash yet, but there are
-enough features in the image that are similar to that of a crash. Although it
-has not been tested, with that threshold value, the goal is that the flight
-controller has enough time to respond to the alert.
-
-As shown in Figure 6, when a potential crash object is detected based on the
-comparison to the threshold value, a signal is communicated. For testing, a
-phrase was printed as the communication signal. The code for UART was written to
-transmit the signal that is decoded as “crash” and then close immediately. UART
-is the final form of communicating the signal.
-
-There is still continuous progress on this project to improve the training
+There is project is in prgress to improve they system by improving the training
 model for higher accuracy and lower loss, as well as research on the different
-parameters of the system.
+parameters to adapt.
 
-## Hardware and Software Set-Up
-The hardware components chosen for this project design are the NVIDIA Jetson
-Nano as the SOM and the Raspberry Pi 4 module v2 camera for the real-time camera
-stream input. These two main components were used to build the physical system.
-The Jetson Nano needs the camera for input, while the image processing and UART
-communication are programmed on the Jetson Nano, completing the system.
+---
 
-The Jetson Nano is an SOM that can run high speed modern AI algorithms, making
-it a small AI computer. It contains connectors and ports for ethernet, microSD
-card, HDMI output, DisplayPort, DC barrel jack 5V power input, USB, and MIPI CSI
-camera. The advantage of this SOM is that it can run multiple neural networks in
-parallel and process several high-resolution sensors simultaneously, which makes
-it ideal for computer vision and high performance computing. In order to use the
-Jetson Nano for deep learning image processing, the environment was first
-assembled with NVIDIA’s JetPack and essential packages and libraries for
-computer vision. Python allows for many open-source libraries to be
-incorporated, such as OpenCV (which has many resources for real-time
-applications). TensorFlow and Keras were installed. Jupyter Notebook was also
-installed and used to simulate the algorithms and neural networks before
-implementing the processing on the Jetson Nano’s GPU.
+## 2. Hardware and Software Set-Up
+The hardware components chosen for this project design are as follows:
+* NVIDIA Jetson Nano
+* Raspberry Pi 4 module v2 camera
+These two main components were used to build the physical system. The Jetson Nano
+needs the camera for input, while the image processing and UART communication are
+programmed on the Jetson Nano, completing the system.
 
-The Raspberry Pi module v2 camera is a high resolution camera
-(3280 x 2464 pixels) that can capture approximately 90 frames per second and is
-compact in size and compatible with the Jetson Nano. It connects through a
-ribbon cable to a CSI port, which makes it possible to connect to the Jetson
-Nano’s MIPI CSI camera connector port. The Raspberry Pi camera was connected to
-the Jetson Nano and real-time stream was ensured, using OpenCV source code,
-which was later used for iterative testing of the image processing codes.
+The components needed to set up the physical hardware of the Jetson Nano was based
+on the following link
+["Getting Started with Jetson Nano Developer Kit"](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit#intro),
+and specific components that we used are listed below:
+* monitor with displayPort or HDMI cable, keyboard and mouse (at least for initial setup)
+* micro-SD card (at least 32 GB)
+* micro-USB power cable or DC-barrel jack power cable
+* ethernet cable (or WiFi USB adapter)
 
+To set up the Jetson Nano for deep learning, the following links were used:
+* ["Getting Started with the NVIDIA Jetson Nano"](https://www.pyimagesearch.com/2019/05/06/getting-started-with-the-nvidia-jetson-nano/)
+* ["How to configure your NVIDIA Jetson Nano for Computer Vision and Deep Learning"](https://www.pyimagesearch.com/2020/03/25/how-to-configure-your-nvidia-jetson-nano-for-computer-vision-and-deep-learning/)
 
-## Design
+---
+
+## 3. Design
 The design of this project is based on the goals and the design requirements
 for the system and specifications of the problem. To meet the goals and
 requirements of the project the system had to be able to take in a real-time
@@ -195,8 +160,9 @@ from providing the machine with a validation set provided information on the
 network’s performance. A validation set was generated by withholding 5% of
 images from the training dataset and using them to evaluate the model.
 
+---
 
-## Files Description
+## 4. Files Description
 
 ### [SWOF_functions_complete.py](https://github.com/safwali11/iSpy/blob/master/SWOF_functions_complete.py)
 
@@ -216,7 +182,9 @@ images from the training dataset and using them to evaluate the model.
 ### [SWOF_RealTime_withUART.py](https://github.com/safwali11/iSpy/blob/master/SWOF_RealTime_withUART.py)
 
 
+---
 
-## Contributors
+## 5. Contributors
 Safwa Ali, Huda Irshad, Daniel Haehn
 UMass Boston
+Sept 2019 - May 2020
