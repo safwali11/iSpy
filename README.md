@@ -198,22 +198,22 @@ images from the training dataset and using them to evaluate the model.
 
 ## Files Description
 
-### SWOF_functions_complete.py
+### [SWOF_functions_complete.py](https://github.com/safwali11/iSpy/blob/master/SWOF_functions_complete.py)
 
 
-### SWOF_dataset_build.py
+### [SWOF_dataset_build.py](https://github.com/safwali11/iSpy/blob/master/SWOF_dataset_build.py)
 
 
-### SWOF_CNN_TRAINING.py
+### [SWOF_CNN_TRAINING.py](https://github.com/safwali11/iSpy/blob/master/SWOF_CNN_training.py)
 
 
-### SWOF_RealTime_PredictionsTesting.ipynp
+### [SWOF_RealTime_PredictionsTesting.ipynp](https://github.com/safwali11/iSpy/blob/master/SWOF_RealTime_PredictionsTesting.ipynb)
 
 
-### SWOF_RealTime_TestingWithImageDisplay.py
+### [SWOF_RealTime_TestingWithImageDisplay.py](https://github.com/safwali11/iSpy/blob/master/SWOF_RealTime_TestingWithImageDisplay.py)
 
 
-### SWOF_RealTime_withUART.py
+### [SWOF_RealTime_withUART.py](https://github.com/safwali11/iSpy/blob/master/SWOF_RealTime_withUART.py)
 
 
 
