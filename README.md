@@ -1,9 +1,9 @@
 # iSpy
 ## Real Time Collision Avoidance Deep Learning Image Processing Alert System
 
-Project Proceedings PDF May 2020
-
 **Version 1.0.0**
+
+[Project Proceedings PDF May 2020](https://github.com/safwali11/iSpy/blob/master/ENGIN492_Project_Proceeding_05292020.pdf)
 
 ## Table of Contents
 1. Introduction
@@ -29,8 +29,8 @@ field calculations are performed by way of optical flow which is the process of
 detecting and calculating the movement of pixels between consecutive frames.
 A threshold was set to trigger an alert to the drone flight controller through
 a universal asynchronous receiver/transmitter, a device for data transmission.
-The training model achieved 85.6\% accuracy with 33.6\% loss. When the system
-was tested, it was able to predict and alert with approximately 72\%.
+The training model achieved 85.6% accuracy with 33.6% loss. When the system
+was tested, it was able to predict and alert with approximately 72%.
 
 There is project is in prgress to improve they system by improving the training
 model for higher accuracy and lower loss, as well as research on the different
@@ -59,23 +59,18 @@ To set up the Jetson Nano for deep learning, the following links were used:
 * ["Getting Started with the NVIDIA Jetson Nano"](https://www.pyimagesearch.com/2019/05/06/getting-started-with-the-nvidia-jetson-nano/)
 * ["How to configure your NVIDIA Jetson Nano for Computer Vision and Deep Learning"](https://www.pyimagesearch.com/2020/03/25/how-to-configure-your-nvidia-jetson-nano-for-computer-vision-and-deep-learning/)
 
----
 
 ## 3. Design
-The design of this project is based on the goals and the design requirements
-for the system and specifications of the problem. To meet the goals and
-requirements of the project the system had to be able to take in a real-time
-camera stream (placed on a drone or any moving device), process the images to
-trigger when potential crash objects would be detected, and inform a flight
-controller of the objects’ location in frame, speed and distance. In order to
-design and create such a system, the following software and hardware
-specifications were required: An image processing technique implemented in
-real-time with high accuracy through the use of neural networks; a small high
-speed digital camera with high resolution compatible with the chosen SOM; and
-an SOM that is equipped with a camera input port, ethernet port, portable power
-supply attachment port, and has high speed processing and large (or expansive)
-memory. An SOM that is compatible to communicate with the BrainFPV drone’s
-microcontroller and the software it uses must be open source.
+The goals and the design requirements for the system and specifications of
+the problem are based on the following specifications:
+* The system must be able to take in a real-time camera stream (placed on
+a drone or any moving device).
+* The image processing system must be able to trigger an alert to a microcontroller
+when a potential crash objects is detected.
+The following diagram illustrates the overall system diagram and sofware pipeline
+design:
+![System Diagram]
+(https://github.com/safwali11/iSpy/blob/master/Images/completesystem.JPG)
 
 This project’s image processing is based on deep learning neural networks to
 predict potential collisions with images from real-time camera inputs. Due to
@@ -105,7 +100,7 @@ the combination of multiple optical flow calculations, making each output image
 a tracking of vector fields throughout several frames, rather than continuously
 stacking the previous result from the newly calculated two frames.
 
-As shown in Figure 4, the vector field results for two frames are not
+As shown in Figure 2, the vector field results for two frames are not
 continuously being stacked for all frames captured from start to finish by the
 system. Rather it is doing the processing two frames at a time and stacking the
 vector field results with results of the next consecutive pair of frames and so
@@ -115,6 +110,11 @@ preloaded videos as the input. The videos were collected from online drone
 footage and saved as "jpeg" images to utilize as the dataset. This use of the
 algorithm allows for the CNN to analyze information that is not attained from
 the raw camera captures to predict when a crash event will soon occur.
+
+![Optical Flow Diagram]
+(https://github.com/safwali11/iSpy/blob/master/Images/otpicalflowdiagram.JPG)
+
+Figure 2. Optical flow using sliding window technique.
 
 The dataset for this project was generated using Keras’ image data generator.
 The dataset was designed to have two label classes: crash and no crash. Images
@@ -127,21 +127,25 @@ more images in a dataset, the larger the neural network, which increases its
 accuracy as a result of the improvement in the network’s learning. To increase
 the dataset, the images were augmented.
 
-An important part of the training model is the validation dataset, which is
-collected from the training datasets and is not trained when compiling the
-model. Instead, the validation set is used to evaluate the model’s fitting
-through accuracy and loss plots once it is trained. Then adjust the dataset for
-both, over-fitting and under-fitting training models, by including more images
-to the dataset to account for the model’s accuracy in learning.
+![Dataset Images]
+(https://github.com/safwali11/iSpy/blob/master/Images/dataset_images.JPG)
+
+Figure 3. Sample "no crash" (left) and "crash" (right) images that makeup the
+dataset.
 
 The CNN model was trained with velocity vector field images. Keras provides a
 sequential CNN model designed with 3 convolutional blocks for learning and one
 classification block classifying. After compiling the model, the system was
 ready to be trained for learning, validating for evaluation, and testing for
-predictions. As shown in Figure 5, the model was trained and tested on a
+predictions. As shown in Figure 4, the model was trained and tested on a
 significant number of epochs, number of iterations the model trains the entire
 training dataset. Increasing the epochs increases the machine’s capability of
 generalizing the data to adapt to new information.
+
+![Training Model Flowchart]
+(https://github.com/safwali11/iSpy/blob/master/Images/CNN_model%20(2).png)
+
+Figure 4. Training model flow chart.
 
 From evaluations of the model’s accuracy and loss for different numbers of
 epochs the model had been shown to be most effective with a minimum of 50 epochs
@@ -150,14 +154,10 @@ success, an adequate training dataset size is required to prevent any
 over-fitting or under-fitting of the neural network's learning capabilities. To
 overcome such problems for the neural network, the training dataset was
 increased by including new images from different footage and applying
-augmentation, horizontal and vertical flip, a zoom range from 0.8 to 1.2, and a
-rotation range from -40 degrees to 40 degrees. These parameters affect the
-training model in accuracy, speed, and fitting of the model from training. The
-specific values and characteristics of the model are shown in Table 1. This
-increase in training dataset size from new images and augmentation increases the
-generalization of the machine to recognize features from new data. The results
-from providing the machine with a validation set provided information on the
-network’s performance. A validation set was generated by withholding 5% of
+augmentation, horizontal and vertical flip, a zoom range, and a rotation. These
+parameters affect the training model in accuracy, speed, and fitting of the model
+from training. The dataset was made up of 3224 training dataset images and 100
+testing dataset images. A validation set was generated by withholding 5% of
 images from the training dataset and using them to evaluate the model.
 
 ---
