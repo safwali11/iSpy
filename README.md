@@ -174,17 +174,19 @@ Figure 5. System threshold flowchart.
 
 ## 4. Project Results
 
-
-
+When we initially trained the model with a much smaller dataset, over-fitting
+ccurred in the model. To improve the neural network, the training model was
+modified and improved in several ways. The most important change is increasing
+e dataset size. We were able to create a dataset of approximately 3300 images.
+was important to increase the epochs from 4 to 50. The current model was
+trained with 50 epochs. This resulted in a complete model
+with approximately 85.61% accuracy and a loss of approximately 33.61%.
+This is an improved accuracy level, however the loss of data remains high.
+If given more time, it would have been best to improve this model by increasing
+the dataset size (ensuring that the images in each class are accurate) and
+training the model with more epochs and larger convolutional layer filter sizes.
 
 ![Training Model Plot Results](https://github.com/safwali11/iSpy/blob/master/Images/plot_acc_loss.png)
-
-Figure 6. Training model accuracy and loss plot.
-
-
-![RealTime Test](https://github.com/safwali11/iSpy/blob/master/Images/realtime.JPG)
-
-Figure 7. Real-time test with threshold print display.
 
 ---
 
