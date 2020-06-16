@@ -116,7 +116,7 @@ footage and saved as "jpeg" images to utilize as the dataset. This use of the
 algorithm allows for the CNN to analyze information that is not attained from
 the raw camera captures to predict when a crash event will soon occur.
 
-![Optical Flow Diagram](https://github.com/safwali11/iSpy/blob/master/Images/otpicalflowdiagram.JPG | width=100)
+![Optical Flow Diagram](https://github.com/safwali11/iSpy/blob/master/Images/otpicalflowdiagram.JPG)
 
 Figure 2. Optical flow using sliding window technique.
 
