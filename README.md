@@ -194,6 +194,8 @@ training the model with more epochs and larger convolutional layer filter sizes.
 
 ## 5. Files Description
 
+Def: SWOF = sliding window optical flow
+
 ### [SWOF_functions_complete.py](https://github.com/safwali11/iSpy/blob/master/SWOF_functions_complete.py)
 
 This Python code contains the functions created and used in the project. The
