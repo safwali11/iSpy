@@ -172,7 +172,7 @@ Figure 5. System threshold flowchart.
 Figure 6. Training model accuracy and loss plot.
 
 
-![RealTime Test]https://github.com/safwali11/iSpy/blob/master/Images/realtime.JPG)
+![RealTime Test](https://github.com/safwali11/iSpy/blob/master/Images/realtime.JPG)
 
 Figure 7. Real-time test with threshold print display.
 
