@@ -74,6 +74,7 @@ a drone or any moving device).
 when a potential crash objects is detected.
 The following diagram illustrates the overall system diagram and sofware pipeline
 design:
+
 ![System Diagram](https://github.com/safwali11/iSpy/blob/master/Images/completesystem.JPG)
 
 This project’s image processing is based on deep learning neural networks to
@@ -115,7 +116,7 @@ footage and saved as "jpeg" images to utilize as the dataset. This use of the
 algorithm allows for the CNN to analyze information that is not attained from
 the raw camera captures to predict when a crash event will soon occur.
 
-![Optical Flow Diagram](https://github.com/safwali11/iSpy/blob/master/Images/otpicalflowdiagram.JPG)
+![Optical Flow Diagram](https://github.com/safwali11/iSpy/blob/master/Images/otpicalflowdiagram.JPG | width=100)
 
 Figure 2. Optical flow using sliding window technique.
 
